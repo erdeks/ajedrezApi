@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use App\User;
 use App\Partida;
+header("Access-Control-Allow-Origin: *");
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -36,16 +37,60 @@ Route::get('/login/{email}/{pass}', function(Request $request, $email, $pass){
     $token = md5(uniqid(rand(), TRUE));
     $usuario->token=$token;
     $usuario->save();
-    header("Access-Control-Allow-Origin: *");
+
     return response()->json(['email'=>$email,'token'=>$token]);
   }else{
     echo "No existe ese user";
   }
 });
 
-Route::get('/addPartida/{token}/{idPartida}', function(Request $request, $token, $idPartida){
-  $usuario = User::select()->where('token', $token)->first();
-  $partida = Partida::select()->where('estado<2')->first();
+Route::get('/partidas/', function(Request $request){
+    $partidas = Partida::all();
+    return response()->json(['partida1'=>$partidas[0], 'partida2'=>$partidas[1], 'partida3'=>$partidas[2], 'partida4'=>$partidas[3]]);
+
+});
+
+Route::get('/addPartida/{token}/{email}/{idPartida}', function(Request $request, $token, $email, $idPartida){
+  $usuario = User::where('token', $token)->first();
+  if($usuario->email == $email){
+    //usuario conectado
+    $partida = Partida::where('id', $idPartida)->first();
+    if($partida->estado == 0){
+      if($partida->jugador0_id == "empty") {
+        $partida->jugador0_id = $email;
+        $partida->estado = 1;
+        $partida->save();
+        $msj="1";
+        return response()->json(['mensaje'=>$msj]);
+      }else if($partida->jugador1_id == "empty"){
+        $partida->jugador1_id = $email;
+        $partida->estado = 1;
+        $partida->save();
+        $msj="2";
+        return response()->json(['mensaje'=>$msj]);
+      }
+    }else if($partida->estado == 1){
+      if($partida->jugador0_id == "empty") {
+        $partida->jugador0_id = $email;
+        $partida->estado = 2;
+        $partida->save();
+        $msj="3";
+        return response()->json(['mensaje'=>$msj]);
+      }else if($partida->jugador1_id == "empty"){
+        $partida->jugador1_id = $email;
+        $partida->estado = 2;
+        $partida->save();
+        $msj="4";
+        return response()->json(['mensaje'=>$msj]);
+      }
+    }else{
+      $msj="5";
+      return response()->json(['mensaje'=>$msj]);
+    }
+  }else{
+    $msj="6";
+    return response()->json(['mensaje'=>$msj]);
+  }
 
 });
 

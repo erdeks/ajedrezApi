@@ -17,10 +17,8 @@ class CreatePartidasTable extends Migration
           $table->increments('id');
           $table->boolean('turno');
           $table->integer('estado');
-          $table->integer('jugador0_id')->unsigned();
-          $table->integer('jugador1_id')->unsigned();
-          $table->foreign('jugador0_id')->references('id')->on('users');
-          $table->foreign('jugador1_id')->references('id')->on('users');
+          $table->string('jugador0_id');
+          $table->string('jugador1_id');
           $table->timestamps();
       });
       Schema::create('fichas', function (Blueprint $table) {
