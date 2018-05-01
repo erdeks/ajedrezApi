@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use App\User;
 use App\Partida;
+use App\Ficha;
 header("Access-Control-Allow-Origin: *");
 /*
 |--------------------------------------------------------------------------
@@ -60,13 +61,13 @@ Route::get('/addPartida/{token}/{email}/{idPartida}', function(Request $request,
         $partida->jugador0_id = $email;
         $partida->estado = 1;
         $partida->save();
-        $msj="1";
+        $msj="Juegas con blancas";
         return response()->json(['mensaje'=>$msj]);
       }else if($partida->jugador1_id == "empty"){
         $partida->jugador1_id = $email;
         $partida->estado = 1;
         $partida->save();
-        $msj="2";
+        $msj="Juegas con blancas";
         return response()->json(['mensaje'=>$msj]);
       }
     }else if($partida->estado == 1){
@@ -74,29 +75,57 @@ Route::get('/addPartida/{token}/{email}/{idPartida}', function(Request $request,
         $partida->jugador0_id = $email;
         $partida->estado = 2;
         $partida->save();
-        $msj="3";
+        $msj="Juegas con Negras";
         return response()->json(['mensaje'=>$msj]);
       }else if($partida->jugador1_id == "empty"){
         $partida->jugador1_id = $email;
         $partida->estado = 2;
         $partida->save();
-        $msj="4";
+        $msj="Juegas con negras";
         return response()->json(['mensaje'=>$msj]);
       }
     }else{
-      $msj="5";
+      $msj="Partida llena";
       return response()->json(['mensaje'=>$msj]);
     }
   }else{
-    $msj="6";
+    $msj="Usuario incorrecto";
     return response()->json(['mensaje'=>$msj]);
   }
 
 });
 
-/*Route::get('/move', function(Request $request){
+Route::get('/movRey/{idPartida}/{fila}/{col}', function(Request $request, $partida, $fila, $columna){
+  $movimiento = new Ficha();
+  $defFil = 1;
+  $defCol= 5;
+  if($defFil-1==$fila && $defCol==$columna || $defFil+1==$fila && $defCol==$columna && $fila < 9 && $fila > 0 && $columna < 9 && $columna > 0){
+    $msj="Movimiento correcto y realizado";
+    $movimiento->partida_id=$partida;
+    $movimiento->fila=$fila;
+    $movimiento->col=$columna;
+    $movimiento->save();
+    return response()->json(['mensaje'=>$msj]);
+  }else if($defFil==$fila && $defCol-1==$columna || $defFil==$fila && $defCol+1==$columna && $fila < 9 && $fila > 0 && $columna < 9 && $columna > 0){
+    $msj="Movimiento correcto y realizado";
+    $movimiento->partida_id=$partida;
+    $movimiento->fila=$fila;
+    $movimiento->col=$columna;
+    $movimiento->save();
+    return response()->json(['mensaje'=>$msj]);
+  }else if($defFil-1==$fila && $defCol-1==$columna || $defFil+1==$fila && $defCol+1==$columna && $fila < 9 && $fila > 0 && $columna < 9 && $columna > 0){
+    $msj="Diagonal correcta y realizada";
+    $movimiento->partida_id=$partida;
+    $movimiento->fila=$fila;
+    $movimiento->col=$columna;
+    $movimiento->save();
+    return response()->json(['mensaje'=>$msj]);
+  }else{
+    $msj="Movimiento incorrecto";
+    return response()->json(['mensaje'=>$msj]);
+  }
 
-});*/
+});
 Route::get('/logout', function(Request $request){
   if (Auth::logout()){
     echo 'Sesion cerrada correctamente';
