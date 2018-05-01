@@ -23,7 +23,6 @@ class CreatePartidasTable extends Migration
       });
       Schema::create('fichas', function (Blueprint $table) {
           $table->increments('id');
-          $table->integer('figura'); // caldrà definir-les al model
           $table->integer('fila');
           $table->integer('col');
           $table->integer('partida_id')->unsigned();
